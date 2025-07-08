@@ -1,70 +1,78 @@
 <template>
   <div class="control-panel">
-    <div class="input-section">
-      <label for="bingo-content" class="input-label">
-        Enter 24 bingo items (one per line):
-      </label>
-      <textarea
-        id="bingo-content"
-        v-model="textareaContent"
-        :disabled="isGenerated"
-        placeholder="Enter your 24 bingo items here..."
-        rows="12"
-        class="content-textarea"
-      ></textarea>
-      
-      <div class="line-count">
-        {{ lineCount }}/24 lines
+    <div class="panel-container">
+      <div class="input-section">
+        <label for="bingo-content" class="input-label">
+          Enter 24 bingo items (one per line):
+        </label>
+        <textarea
+          id="bingo-content"
+          v-model="textareaContent"
+          :disabled="isGenerated"
+          placeholder="Enter your 24 bingo items here..."
+          rows="12"
+          class="content-textarea"
+        ></textarea>
+        
+        <div class="line-count" :class="{ 'valid': lineCount === 24 }">
+          {{ lineCount }}/24 lines
+        </div>
       </div>
-    </div>
 
-    <div class="button-section">
-      <button
-        @click="loadExample"
-        :disabled="isGenerated"
-        class="btn btn-secondary"
-      >
-        Example
-      </button>
-      
-      <button
-        @click="generateBoard"
-        :disabled="!canGenerate"
-        class="btn btn-primary"
-      >
-        Generate
-      </button>
-      
-      <button
-        @click="shuffleBoard"
-        :disabled="!isGenerated"
-        class="btn btn-secondary"
-      >
-        Shuffle
-      </button>
-      
-      <button
-        @click="clearContent"
-        class="btn btn-danger"
-      >
-        Clear Content
-      </button>
-    </div>
+      <div class="button-section">
+        <button
+          @click="loadExample"
+          :disabled="isGenerated"
+          class="btn btn-secondary"
+        >
+          <span class="btn-icon">📝</span>
+          Example
+        </button>
+        
+        <button
+          @click="generateBoard"
+          :disabled="!canGenerate"
+          class="btn btn-primary"
+        >
+          <span class="btn-icon">🎯</span>
+          Generate
+        </button>
+        
+        <button
+          @click="shuffleBoard"
+          :disabled="!isGenerated"
+          class="btn btn-secondary"
+        >
+          <span class="btn-icon">🔀</span>
+          Shuffle
+        </button>
+        
+        <button
+          @click="clearContent"
+          class="btn btn-danger"
+        >
+          <span class="btn-icon">🗑️</span>
+          Clear
+        </button>
+      </div>
 
-    <div class="instructions">
-      <p>
-        <strong>How to use:</strong>
-      </p>
-      <ol>
-        <li>Enter 24 items for your bingo board (one per line)</li>
-        <li>Click "Generate" to create your board</li>
-        <li>Click squares to mark them as completed</li>
-        <li>Click "Shuffle" to randomize the board layout</li>
-        <li>Share the URL to let others use your board</li>
-      </ol>
-      <p class="share-note">
-        <strong>To share this board, copy the URL from the address bar.</strong>
-      </p>
+      <div class="instructions">
+        <div class="instructions-header">
+          <span class="instructions-icon">💡</span>
+          <h3>How to use:</h3>
+        </div>
+        <ol>
+          <li>Enter 24 items for your bingo board (one per line)</li>
+          <li>Click "Generate" to create your board</li>
+          <li>Click squares to mark them as completed</li>
+          <li>Click "Shuffle" to randomize the board layout</li>
+          <li>Share the URL to let others use your board</li>
+        </ol>
+        <div class="share-note">
+          <span class="share-icon">🔗</span>
+          <strong>To share this board, copy the URL from the address bar.</strong>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -155,151 +163,243 @@ const clearContent = () => {
 <style scoped>
 .control-panel {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 400px;
+  justify-content: center;
   width: 100%;
+}
+
+.panel-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 450px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .input-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .input-label {
-  font-weight: 600;
+  font-weight: 700;
   color: #2c3e50;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .content-textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  padding: 1rem;
+  border: 3px solid #e1e8ed;
+  border-radius: 12px;
   font-family: inherit;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  line-height: 1.5;
   resize: vertical;
-  min-height: 200px;
-  transition: border-color 0.2s ease;
+  min-height: 220px;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .content-textarea:focus {
   outline: none;
   border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+  transform: translateY(-1px);
 }
 
 .content-textarea:disabled {
   background-color: #f8f9fa;
   color: #6c757d;
   cursor: not-allowed;
+  border-color: #dee2e6;
 }
 
 .line-count {
   text-align: right;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #6c757d;
-  font-weight: 500;
+  font-weight: 600;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.line-count.valid {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
 }
 
 .button-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
 .btn {
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
 }
 
 .btn-primary {
-  background: #3498db;
+  background: linear-gradient(135deg, #3498db, #2980b9);
   color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2980b9;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #2980b9, #1f5f8b);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
 }
 
 .btn-secondary {
-  background: #95a5a6;
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
   color: white;
+  box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #7f8c8d;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+  box-shadow: 0 8px 25px rgba(149, 165, 166, 0.4);
 }
 
 .btn-danger {
-  background: #e74c3c;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
   color: white;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #c0392b;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
 }
 
 .instructions {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 1.5rem;
+  border-radius: 12px;
   border-left: 4px solid #3498db;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.instructions p {
-  margin-bottom: 0.5rem;
+.instructions-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.instructions-icon {
+  font-size: 1.2rem;
+}
+
+.instructions h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
 }
 
 .instructions ol {
-  margin: 0.5rem 0;
+  margin: 0.75rem 0;
   padding-left: 1.5rem;
+  color: #495057;
 }
 
 .instructions li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 .share-note {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #e8f5e8;
-  border-radius: 4px;
-  color: #2d5a2d;
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border-radius: 8px;
+  color: #155724;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #c3e6cb;
+}
+
+.share-icon {
+  font-size: 1.1rem;
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  .control-panel {
-    gap: 1rem;
+  .panel-container {
+    padding: 1.5rem;
+    gap: 1.5rem;
   }
   
   .button-section {
-    flex-direction: row;
-    flex-wrap: wrap;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
   
   .btn {
-    flex: 1;
-    min-width: 120px;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .content-textarea {
+    min-height: 180px;
+    font-size: 0.9rem;
+  }
+  
+  .instructions {
+    padding: 1.25rem;
+  }
+}
+
+/* Tablet responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .panel-container {
+    max-width: 400px;
   }
 }
 </style> 

@@ -1,5 +1,3 @@
-import { encodeLines, decodeLines } from './base64'
-
 /**
  * URL parameters interface
  */
