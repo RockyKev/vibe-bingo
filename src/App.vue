@@ -32,10 +32,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import BingoBoard from './components/BingoBoard.vue'
 import ControlPanel from './components/ControlPanel.vue'
-import { getParams, setParams, shuffleOrder, toggleMarked as toggleMarkedUtil, parseCommaSeparated, toCommaSeparated } from './utils/url'
+import { 
+  getParams, 
+  setParams, 
+  shuffleOrder, 
+  toggleMarked as toggleMarkedUtil, 
+  parseCommaSeparated, 
+  toCommaSeparated,
+  validateParams,
+  copyUrlToClipboard
+} from './utils/url'
 import { encodeLines, decodeLines } from './utils/base64'
 
 // Reactive state
@@ -50,24 +59,68 @@ const isGenerated = computed(() => {
 
 // Initialize app from URL parameters
 onMounted(() => {
+  try {
+    const params = getParams()
+    
+    // Validate URL parameters
+    const validation = validateParams(params)
+    if (!validation.isValid) {
+      console.warn('Invalid URL parameters:', validation.errors)
+      // Clear invalid parameters
+      setParams()
+      return
+    }
+    
+    if (params.data) {
+      const decodedData = decodeLines(params.data)
+      if (decodedData.length === 24) {
+        bingoData.value = decodedData
+      } else {
+        console.warn('Invalid data parameter: expected 24 items, got', decodedData.length)
+        setParams()
+        return
+      }
+    }
+    
+    if (params.order) {
+      const orderArray = parseCommaSeparated(params.order)
+      if (orderArray.length === 24) {
+        bingoOrder.value = orderArray
+      } else {
+        console.warn('Invalid order parameter: expected 24 items, got', orderArray.length)
+        setParams()
+        return
+      }
+    }
+    
+    if (params.marked) {
+      markedSquares.value = parseCommaSeparated(params.marked)
+    }
+  } catch (error) {
+    console.error('Error initializing app from URL:', error)
+    // Clear URL parameters on error
+    setParams()
+  }
+})
+
+// Watch for URL changes (for browser back/forward)
+watch(() => window.location.search, () => {
   const params = getParams()
+  const validation = validateParams(params)
   
-  if (params.data) {
-    const decodedData = decodeLines(params.data)
-    if (decodedData.length === 24) {
-      bingoData.value = decodedData
+  if (validation.isValid && params.data && params.order) {
+    try {
+      const decodedData = decodeLines(params.data)
+      const orderArray = parseCommaSeparated(params.order)
+      
+      if (decodedData.length === 24 && orderArray.length === 24) {
+        bingoData.value = decodedData
+        bingoOrder.value = orderArray
+        markedSquares.value = parseCommaSeparated(params.marked || '')
+      }
+    } catch (error) {
+      console.error('Error handling URL change:', error)
     }
-  }
-  
-  if (params.order) {
-    const orderArray = parseCommaSeparated(params.order)
-    if (orderArray.length === 24) {
-      bingoOrder.value = orderArray
-    }
-  }
-  
-  if (params.marked) {
-    markedSquares.value = parseCommaSeparated(params.marked)
   }
 })
 
@@ -79,50 +132,76 @@ const loadExample = () => {
 }
 
 const generateBoard = (content: string[]) => {
-  bingoData.value = content
-  bingoOrder.value = shuffleOrder()
-  markedSquares.value = []
-  
-  // Update URL
-  setParams(
-    encodeLines(content),
-    toCommaSeparated(bingoOrder.value),
-    ''
-  )
-}
-
-const shuffleBoard = () => {
-  if (isGenerated.value) {
+  try {
+    bingoData.value = content
     bingoOrder.value = shuffleOrder()
     markedSquares.value = []
     
     // Update URL
     setParams(
-      encodeLines(bingoData.value),
+      encodeLines(content),
       toCommaSeparated(bingoOrder.value),
       ''
     )
+  } catch (error) {
+    console.error('Error generating board:', error)
+  }
+}
+
+const shuffleBoard = () => {
+  if (isGenerated.value) {
+    try {
+      bingoOrder.value = shuffleOrder()
+      markedSquares.value = []
+      
+      // Update URL
+      setParams(
+        encodeLines(bingoData.value),
+        toCommaSeparated(bingoOrder.value),
+        ''
+      )
+    } catch (error) {
+      console.error('Error shuffling board:', error)
+    }
   }
 }
 
 const toggleMarked = (index: number) => {
-  markedSquares.value = toggleMarkedUtil(index, markedSquares.value)
-  
-  // Update URL
-  setParams(
-    encodeLines(bingoData.value),
-    toCommaSeparated(bingoOrder.value),
-    toCommaSeparated(markedSquares.value)
-  )
+  try {
+    markedSquares.value = toggleMarkedUtil(index, markedSquares.value)
+    
+    // Update URL
+    setParams(
+      encodeLines(bingoData.value),
+      toCommaSeparated(bingoOrder.value),
+      toCommaSeparated(markedSquares.value)
+    )
+  } catch (error) {
+    console.error('Error toggling marked square:', error)
+  }
 }
 
 const clearContent = () => {
-  bingoData.value = []
-  bingoOrder.value = []
-  markedSquares.value = []
-  
-  // Clear URL parameters
-  setParams()
+  try {
+    bingoData.value = []
+    bingoOrder.value = []
+    markedSquares.value = []
+    
+    // Clear URL parameters
+    setParams()
+  } catch (error) {
+    console.error('Error clearing content:', error)
+  }
+}
+
+// Expose copy URL function for potential future use
+const copyUrl = async () => {
+  try {
+    await copyUrlToClipboard()
+    // Could add a toast notification here
+  } catch (error) {
+    console.error('Error copying URL:', error)
+  }
 }
 </script>
 
@@ -188,6 +267,7 @@ const clearContent = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
 }
 
 .main-container {
@@ -252,6 +332,9 @@ const clearContent = () => {
     font-size: 1rem;
   }
   
+  .app-main {
+    padding: 1rem;
+  }
   
   .main-container {
     gap: 2rem;

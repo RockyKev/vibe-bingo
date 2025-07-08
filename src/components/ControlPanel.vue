@@ -69,8 +69,15 @@
           <li>Share the URL to let others use your board</li>
         </ol>
         <div class="share-note">
-          <span class="share-icon">🔗</span>
-          <strong>To share this board, copy the URL from the address bar.</strong>
+          <span class="share-icon">��</span>
+          <div class="share-content">
+            <strong>To share this board:</strong>
+            <ul>
+              <li>Copy the URL from your browser's address bar</li>
+              <li>Send it to friends - they'll see the exact same board</li>
+              <li>Their marked squares will be preserved in the URL</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -360,13 +367,28 @@ const clearContent = () => {
   color: #155724;
   font-size: 0.9rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   border: 1px solid #c3e6cb;
 }
 
 .share-icon {
   font-size: 1.1rem;
+  margin-top: 0.1rem;
+}
+
+.share-content {
+  flex: 1;
+}
+
+.share-content ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.25rem;
+}
+
+.share-content li {
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
 }
 
 /* Mobile responsive */
@@ -393,6 +415,10 @@ const clearContent = () => {
   
   .instructions {
     padding: 1.25rem;
+  }
+  
+  .share-note {
+    padding: 0.875rem;
   }
 }
 
