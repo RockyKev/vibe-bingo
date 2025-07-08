@@ -1,0 +1,121 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## bingo-web-app.mdc
+
+### 🧾 Project Summary
+A minimal TypeScript + Vue 3 web app for generating and sharing custom Bingo boards via URL. Emphasis on simplicity, mobile responsiveness, and zero backend. URL stores all state: box content, order, and marked squares.
+
+---
+
+### 🗂 File Structure
+
+```
+/bingo-web-app/
+├── index.html
+├── src/
+│   ├── App.vue
+│   ├── components/
+│   │   ├── BingoBoard.vue
+│   │   ├── ControlPanel.vue
+│   ├── main.ts
+│   └── utils/
+│       ├── base64.ts
+│       ├── url.ts
+├── styles/
+│   └── main.css
+├── vite.config.ts
+```
+
+---
+
+### 🧠 Core Logic
+
+#### 📦 URL Parameters
+
+- `data`: base64-encoded list of 24 lines (textarea input)
+- `order`: comma-separated indexes defining box order (0–23)
+- `marked`: comma-separated indexes of marked squares (0–23, excluding index 12)
+
+#### 🤖 App Behavior
+
+- If **no URL params**, app shows:
+  - Empty 24-line textarea
+  - Disabled “Generate” button
+  - Active “Example” button
+- Once 24 lines are entered:
+  - “Generate” enables → builds URL (`data`, `order`, resets `marked`)
+- Clicking any board square toggles its index in `marked`, silently updates URL
+- Free space is **always at index 12** and always considered "marked"
+- “Shuffle” re-randomizes `order`, keeps `data` and `marked = []`
+- “Clear Content” resets everything, clears URL params and re-enables textarea
+
+---
+
+### 📱 Layout
+
+#### Mobile (≤768px):
+- Stack: Bingo board on top, controls below
+
+#### Desktop (>768px):
+- Side-by-side layout:
+  - Left: Bingo board
+  - Right: Textarea, buttons, instructions
+
+---
+
+### 🧩 UI Components
+
+#### ✅ BingoBoard.vue
+
+- 5x5 grid (CSS grid layout)
+- Index 12 = free space (hardcoded)
+- Squares clickable → toggle state
+- Uses `data`, `order`, and `marked` to render correct values and styling
+
+#### 📝 ControlPanel.vue
+
+- 24-line textarea (disabled after generate)
+- “Example” → fills textarea with dummy content, updates URL
+- “Generate” → base64s input, shuffles `order`, clears `marked`
+- “Shuffle” → reshuffles `order`, keeps `data`
+- “Clear Content” → resets everything
+- Instructional text: “To share this board, copy the URL from the address bar.”
+
+---
+
+### 🧮 Utility Functions
+
+#### base64.ts
+
+- `encodeLines(lines: string[]): string`
+- `decodeLines(base64: string): string[]`
+
+#### url.ts
+
+- `getParams(): { data, order, marked }`
+- `setParams(data, order, marked): void`  
+  → uses `history.replaceState` to silently update
+
+- `shuffleOrder(): number[]`
+- `toggleMarked(index: number, marked: number[]): number[]`
+
+---
+
+### 🎨 Styles
+
+- Basic CSS (no frameworks)
+- Mobile-first, grid-based board
+- Marked cells: `.marked` class changes background color
+- Free space: `.free-space` class, always visually distinct
+
+---
+
+### ✅ Completion Notes
+
+- No local storage, server, or user accounts
+- Fully stateful through URL
+- Designed for rapid customization and sharing
+
