@@ -42,8 +42,7 @@ import {
   toggleMarked as toggleMarkedUtil, 
   parseCommaSeparated, 
   toCommaSeparated,
-  validateParams,
-  copyUrlToClipboard
+  validateParams
 } from './utils/url'
 import { encodeLines, decodeLines } from './utils/base64'
 
@@ -194,15 +193,6 @@ const clearContent = () => {
   }
 }
 
-// Expose copy URL function for potential future use
-const copyUrl = async () => {
-  try {
-    await copyUrlToClipboard()
-    // Could add a toast notification here
-  } catch (error) {
-    console.error('Error copying URL:', error)
-  }
-}
 </script>
 
 <style scoped>
