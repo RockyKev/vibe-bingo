@@ -76,7 +76,8 @@ onMounted(() => {
         bingoData.value = decodedData
       } else {
         console.warn('Invalid data parameter: expected 24 items, got', decodedData.length)
-        setParams()
+        // Try to recover by clearing just the data parameter
+        setParams(undefined, params.order, params.marked)
         return
       }
     }
@@ -87,7 +88,8 @@ onMounted(() => {
         bingoOrder.value = orderArray
       } else {
         console.warn('Invalid order parameter: expected 24 items, got', orderArray.length)
-        setParams()
+        // Try to recover by clearing just the order parameter
+        setParams(params.data, undefined, params.marked)
         return
       }
     }

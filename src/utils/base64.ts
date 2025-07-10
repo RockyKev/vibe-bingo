@@ -4,8 +4,17 @@
  * @returns Base64 encoded string
  */
 export function encodeLines(lines: string[]): string {
-  const jsonString = JSON.stringify(lines)
-  return btoa(jsonString)
+  try {
+    const jsonString = JSON.stringify(lines)
+    // Use TextEncoder for proper Unicode handling
+    const encoder = new TextEncoder()
+    const bytes = encoder.encode(jsonString)
+    const binaryString = Array.from(bytes, byte => String.fromCharCode(byte)).join('')
+    return btoa(binaryString)
+  } catch (error) {
+    console.error('Error encoding lines:', error)
+    return ''
+  }
 }
 
 /**
@@ -15,7 +24,13 @@ export function encodeLines(lines: string[]): string {
  */
 export function decodeLines(base64: string): string[] {
   try {
-    const jsonString = atob(base64)
+    const binaryString = atob(base64)
+    const bytes = new Uint8Array(binaryString.length)
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+    const decoder = new TextDecoder()
+    const jsonString = decoder.decode(bytes)
     return JSON.parse(jsonString)
   } catch (error) {
     console.error('Error decoding base64:', error)

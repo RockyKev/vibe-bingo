@@ -128,7 +128,8 @@ export function validateParams(params: UrlParams): {
 } {
   const errors: string[] = []
   
-  if (params.data && params.data.length > 10000) {
+  // Increased size limit to handle longer content with special characters
+  if (params.data && params.data.length > 15000) {
     errors.push('Data parameter is too large')
   }
   
